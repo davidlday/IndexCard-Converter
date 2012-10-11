@@ -140,7 +140,7 @@ print $rtf '{\pard\qc\f0\sb5760 approximately ';
 print $rtf $fathom->num_words;
 print $rtf ' words\par}\sect}';
 # Page Headers
-print $rtf ' {\header\pard\qr\plain\f0\fs24 ';
+print $rtf '{\header\pard\qr\plain\f0\fs24 ';
 print $rtf "$msAuthorLN  / $msTitle / ";
 print $rtf '\chpgn\par}';
 # Chapters
