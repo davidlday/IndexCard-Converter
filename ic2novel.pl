@@ -70,7 +70,11 @@ foreach my $indexCard (@indexCards) {
         my $section_start = ($msChapterNum == 1) ? '{\sectd\sbkpage\pgnrestart' : '{\sectd\sbkpage';
         $section_start .= "\n" . '{\pard\s3\fs24\outlinelevel2\qc\sl480\slmult1\sb4320 Chapter ' . $msChapterNum . '\par}' . "\n";
         if ($includeChapterTitles) { $section_start .= '{\pard\s2\fs24\outlinelevel3\qc\sl480\slmult1 ' . $title . '\par}' . "\n"; }
-        $section_start .= '{\pard\fs24\sl480\slmult1\qc\par}' . "\n";
+        if ($includeSynopsis) {
+            $section_start .= '{\pard\s1\fs24\qc\sl480\slmult1{\v\fs16 {\atnid synopsis}\chatn{\*\annotation\pard\plain \s224 \fs20 {\fs16 \chatn }' . $synopsis . '}}\par}' . "\n";
+        } else {
+            $section_start .= '{\pard\s1\fs24\qc\sl480\slmult1\par}' . "\n";
+        }
         $msChapters .= $section_start;
         my @chapterLines = split('\n', $text);
         my $sectionNum = 1;
@@ -85,7 +89,7 @@ foreach my $indexCard (@indexCards) {
             }
         }
         $msChapters .= '\sect}' . "\n";
-         
+
         $msChapterNum++;
     }
 }
