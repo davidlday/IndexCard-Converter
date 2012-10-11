@@ -68,8 +68,8 @@ foreach my $indexCard (@indexCards) {
     } elsif ($inDraft eq 'true') {
         $fathom->analyse_block($text, 1);
         my $section_start = ($msChapterNum == 1) ? '{\sectd\sbkpage\pgnrestart' : '{\sectd\sbkpage';
-        $section_start .= "\n" . '{\pard\fs24\sl480\slmult1\qc\sb4320 Chapter ' . $msChapterNum . '\par}' . "\n";
-        if ($includeChapterTitles) { $section_start .= '{\pard\fs24\sl480\slmult1\qc ' . $title . '\par}' . "\n"; }
+        $section_start .= "\n" . '{\pard\s3\fs24\outlinelevel2\qc\sl480\slmult1\sb4320 Chapter ' . $msChapterNum . '\par}' . "\n";
+        if ($includeChapterTitles) { $section_start .= '{\pard\s2\fs24\outlinelevel3\qc\sl480\slmult1 ' . $title . '\par}' . "\n"; }
         $section_start .= '{\pard\fs24\sl480\slmult1\qc\par}' . "\n";
         $msChapters .= $section_start;
         my @chapterLines = split('\n', $text);
@@ -79,9 +79,9 @@ foreach my $indexCard (@indexCards) {
             $lineNum++;
             next if ($line eq '');
             if ($line ne '#') {
-                $msChapters .= '{\pard\fs24\fi720\sl480\slmult1' . "\n$line\n" . '\par}';
+                $msChapters .= '{\pard\s7\fs24\fi720\sl480\slmult1' . "\n$line\n" . '\par}';
             } elsif ($line eq '#') {
-                $msChapters .= '{\pard\fs24\sl480\slmult1\qc#\par}';
+                $msChapters .= '{\pard\s2\fs24\outlinelevel3\qc\sl480\slmult1#\par}';
             }
         }
         $msChapters .= '\sect}' . "\n";
@@ -108,18 +108,44 @@ print $fathom->report;
 
 # Pring the RTF Document
 my $rtf = FileHandle->new("> $rtfFile");
-print $rtf '{\rtf1\ansi\deff0\margl1440\margr1440\margt1440\margb1440{\fonttbl{\f0 Courier New;}}{\sectd {\pard\ql\plain\f0\fs24';
+
+# Requisite Header
+print $rtf '{\rtf1\ansi\deff0\margl1440\margr1440\margt1440\margb1440{\fonttbl{\f0 Courier New;}}';
+# RTF Stylesheet
+print $rtf '{\stylesheet';
+print $rtf '{\fs24 \sbasedon222\snext0{\*\keycode \shift\ctrl n} Normal;}';
+print $rtf '{\s1\sbasedon0\snext1\fs24\sl480\slmult1 Manuscript Normal;}';
+print $rtf '{\s2\sbasedon1\snext1\fs24\outlinelevel3\qc\sl480\slmult1 Manuscript Section Break;}';
+print $rtf '{\s3\sbasedon2\snext1\fs24\outlinelevel2\qc\sl480\slmult1\sb4320 Manuscript Chapter Heading;}';
+print $rtf '{\s4\sbasedon2\snext1\fs24\qc\sl480\slmult1 Manuscript By-Line;}';
+print $rtf '{\s5\sbasedon2\snext4\fs24\outlinelevel0\qc\sl480\slmult1\sb4320 Manuscript Title;}';
+print $rtf '{\s6\sbasedon5\snext3\fs24\outlinelevel1\qc\sl480\slmult1\sb4320 Manuscript Part;}';
+print $rtf '{\s7\sbasedon0\snext1\fs24\fi720\sl480\slmult1 Manuscript Body;}';
+print $rtf '}';
+
+# Title Page
+print $rtf '{\sectd {\pard\ql\plain\f0\fs24';
 print $rtf $msAuthorInfo;
-print $rtf '\par}{\pard\fs24\sl480\slmult1\qc\sb4320 ';
+print $rtf '\par}';
+# Manuscript Title
+print $rtf '{\pard\s5\fs24\outlinelevel0\qc\sl480\slmult1\sb4320 ';
 print $rtf $msTitle;
-print $rtf '\par}{\pard\fs24\sl480\slmult1\qc by ';
+print $rtf '\par}';
+# Manuscript By-Line
+print $rtf '{\pard\s4\fs24\qc\sl480\slmult1 by ';
 print $rtf $msAuthorName;
-print $rtf ' \par}{\pard\qc\f0\sb5760 approximately ';
+print $rtf ' \par}';
+# Manuscript Word Count
+print $rtf '{\pard\qc\f0\sb5760 approximately ';
 print $rtf $fathom->num_words;
-print $rtf ' words\par}\sect}{\header\pard\qr\plain\f0\fs24 ';
+print $rtf ' words\par}\sect}';
+# Page Headers
+print $rtf ' {\header\pard\qr\plain\f0\fs24 ';
 print $rtf "$msAuthorLN  / $msTitle / ";
 print $rtf '\chpgn\par}';
+# Chapters
 print $rtf $msChapters;
+# Closure
 print $rtf '}';
 
 exit;
